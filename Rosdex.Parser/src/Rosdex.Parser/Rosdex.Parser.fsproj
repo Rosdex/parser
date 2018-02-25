@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!--Изначально я сделал netstadard библиотеку, однако потом выяснилось, что часть библиотек еще не было перенесено.-->
+    <!--<TargetFramework>netstandard2.0</TargetFramework>-->
+    <TargetFramework>net461</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\paket-files\lasandell\FSharpXLinqExtensions\XLinqExtensions.fs">
+      <Paket>True</Paket>
+      <Link>paket-files/XLinqExtensions.fs</Link>
+    </Compile>
+    <Compile Include="Library.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="paket.references" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

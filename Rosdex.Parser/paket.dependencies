@@ -1,0 +1,25 @@
+source https://www.nuget.org/api/v2
+generate_load_scripts: true
+framework: net461, netstandard2.0
+
+nuget FSharp.Data
+nuget Microsoft.FSharpLu.Json
+
+nuget SQLProvider
+nuget Npgsql 3.1.0
+nuget System.Threading.Tasks.Extensions
+
+nuget Http.fs
+nuget FSharp.Control.AsyncSeq
+
+github lasandell/FSharpXLinqExtensions XLinqExtensions.fs
+
+group Tests
+source https://www.nuget.org/api/v2	
+
+generate_load_scripts: true
+framework: net461, netstandard2.0
+
+nuget Expecto
+nuget Expecto.FsCheck
+nuget Expecto.VisualStudio.TestAdapter version_in_path: true

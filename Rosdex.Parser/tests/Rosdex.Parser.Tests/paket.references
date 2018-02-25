@@ -1,0 +1,14 @@
+﻿FSharp.Data
+Microsoft.FSharpLu.Json
+
+SQLProvider
+Npgsql
+System.Threading.Tasks.Extensions
+
+Http.fs
+FSharp.Control.AsyncSeq
+
+group Tests
+	Expecto
+	Expecto.FsCheck
+	Expecto.VisualStudio.TestAdapter
