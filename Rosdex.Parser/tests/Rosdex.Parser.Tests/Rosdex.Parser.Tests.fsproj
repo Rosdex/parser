@@ -63,7 +63,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Utils\Utils.fs" />
+    <Compile Include="Utils\FsUnitLike.fs" />
     <Compile Include="SampleTests.fs" />
+    <Compile Include="Collections.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
