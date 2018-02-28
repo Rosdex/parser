@@ -141,18 +141,29 @@ module Catalog =
     let removeSingle id catalog =
         catalog |> mapStorage (Map.remove id)
 
-    let removeCascadeMany ids catalog =
+    let private descendantsMany catalog ids =
         let valuesByParentId = valuesByParentId catalog
         ids
-        |> List.unreduce (
-            List.choose (Some >> valuesByParentId.TryFind)
-            >> List.concat
-            >> List.map catalog.GetId
-            >> function
+        |> List.unfold (fun state ->
+            state
+            |> List.choose (Some >> valuesByParentId.TryFind)
+            |> List.concat
+            |> function
                 | [] -> None
-                | p -> Some p)
+                | p -> Some (p, p |> List.map catalog.GetId))
         |> List.concat
-        |> List.append <| ids
+
+    let descendants catalog id =
+        descendantsMany catalog [id]
+
+    let descendantsAndSelf catalog id =
+        descendants catalog id
+        |> List.append (tryFind catalog id |> Option.toList)
+
+    let removeCascadeMany ids catalog =
+        descendantsMany catalog ids
+        |> List.map catalog.GetId
+        |> List.append ids
         |> List.fold (fun state id -> Map.remove id state) catalog.Storage
         |> fun storage -> { catalog with Storage = storage }
 

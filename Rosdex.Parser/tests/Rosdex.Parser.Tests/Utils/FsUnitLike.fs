@@ -18,5 +18,8 @@ module FsUnitLikeSyntax =
     let shouldAll predicate message items =
         Expect.all items predicate message
 
+    let shouldContainsAll expected message items =
+        Expect.containsAll items expected message
+
     let shouldHaveLength expected message items =
         Expect.hasCountOf items expected message

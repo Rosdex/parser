@@ -69,10 +69,13 @@ module CatalogTests =
         let ofCount basis count=
             [1..count] |> ofNumbers basis
 
-        let children basis totalCount root =
+        let children basis item =
+            List.init basis (fun i -> item * basis + i)
+
+        let descendants basis totalCount root =
             [root]
             |> List.unreduce (
-                List.collect (fun p -> List.init basis (fun i -> p * basis + i))
+                List.collect (children basis)
                 >> List.filter ((>=) totalCount)
                 >> function
                     | [] -> None
@@ -82,8 +85,12 @@ module CatalogTests =
         open Arb
 
         let ofCase case = ofCount case.Basis case.Count
-        let childrenInCase config =
-            children config.Basis config.Count config.Target
+
+        let descendantsInCase case =
+            descendants case.Basis case.Count case.Target
+
+        let descendantsAndSelfInCase case =
+            [case.Target] @ descendantsInCase case
 
     open Arb
 
@@ -103,12 +110,11 @@ module CatalogTests =
                     [case.Target]
                     |> tryPathes case
                 let incomplete case =
-                    DivisorCatalog.childrenInCase case
+                    DivisorCatalog.descendantsInCase case
                     |> tryPathes case
                 let complete case =
                     [1..case.Count]
-                    |> List.except (DivisorCatalog.childrenInCase case)
-                    |> List.except [case.Target]
+                    |> List.except (DivisorCatalog.descendantsAndSelfInCase case)
                     |> tryPathes case
                 let all case =
                     [1..case.Count]
@@ -163,14 +169,23 @@ module CatalogTests =
                         | Catalog.Path.Complete path -> path.Head.ParentId = None
                         | _ -> false) ""
             ]
+            testPropertyWithConfig Arb.config "descendants" <| fun case ->
+                DivisorCatalog.ofCase case
+                |> Catalog.descendants <| case.Target
+                |> List.map ValueStub.id
+                |> shouldContainsAll (DivisorCatalog.descendantsInCase case) ""
+            testPropertyWithConfig Arb.config "descendantsAndSelf" <| fun case ->
+                DivisorCatalog.ofCase case
+                |> Catalog.descendantsAndSelf <| case.Target
+                |> List.map ValueStub.id
+                |> shouldContainsAll (DivisorCatalog.descendantsAndSelfInCase case) ""
             testPropertyWithConfig Arb.config "removeCascade" <| fun case ->
                 DivisorCatalog.ofCase case
                 |> Catalog.removeCascade case.Target
                 |> Catalog.storage
                 |> shouldEqual (
                     [1..case.Count]
-                    |> List.except (DivisorCatalog.childrenInCase case)
-                    |> List.except [case.Target]
+                    |> List.except (DivisorCatalog.descendantsAndSelfInCase case)
                     |> DivisorCatalog.ofNumbers case.Basis
                     |> Catalog.storage) ""
             testList "validate" [
@@ -180,7 +195,7 @@ module CatalogTests =
                     |> shouldEqual Catalog.Validation.Valid ""
                 testPropertyWithConfig Arb.config "has cycle" <| fun case ->
                     DivisorCatalog.ofCase case
-                    |> match DivisorCatalog.childrenInCase case with
+                    |> match DivisorCatalog.descendantsInCase case with
                         | [] ->
                             Catalog.add { Id = 0; ParentId = Some case.Target }
                             >> Catalog.add { Id = case.Target; ParentId = Some 0 }
