@@ -4,7 +4,7 @@ open Expecto
 open FsCheck
 
 module FsCheckConfig =
-    let private addType config type' =
+    let addType config type' =
         { config with
             arbitrary =
                 type' :: config.arbitrary }

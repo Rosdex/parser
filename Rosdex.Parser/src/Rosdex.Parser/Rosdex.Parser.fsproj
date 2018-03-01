@@ -12,6 +12,7 @@
     </Compile>
     <Compile Include="Utils.fs" />
     <Compile Include="Collections.fs" />
+    <Compile Include="Yandex.Yml.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>
   <ItemGroup>
