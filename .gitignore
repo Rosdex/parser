@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 /Rosdex.Parser/.paket/load
+/Rosdex.Parser/src/Rosdex.Parser/Scripts/gitignored.json

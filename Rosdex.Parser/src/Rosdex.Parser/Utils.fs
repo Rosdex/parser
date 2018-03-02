@@ -9,3 +9,17 @@ module List =
         impl value []
         |> List.rev
         |> List.tail
+
+module Result =
+    let isOk = function Ok _ -> true | _ -> false
+    let isError = function Error _ -> true | _ -> false
+
+    let tryOk = function Ok p -> Some p | _ -> None
+    let tryError = function Error p -> Some p | _ -> None
+
+    let ok = function
+        | Ok p -> p
+        | p -> p |> sprintf "it is %A" |> invalidOp
+    let error = function
+        | Error p -> p
+        | p -> p |> sprintf "it is %A" |> invalidOp

@@ -21,5 +21,8 @@ module FsUnitLikeSyntax =
     let shouldContainsAll expected message items =
         Expect.containsAll items expected message
 
+    let shouldContainsString substring message subject =
+        Expect.stringContains subject substring message
+
     let shouldHaveLength expected message items =
         Expect.hasCountOf items expected message

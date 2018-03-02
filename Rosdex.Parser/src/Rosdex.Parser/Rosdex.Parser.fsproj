@@ -13,10 +13,13 @@
     <Compile Include="Utils.fs" />
     <Compile Include="Collections.fs" />
     <Compile Include="Yandex.Yml.fs" />
+    <Compile Include="Csv.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.references" />
+    <None Include="Scripts\Utils.Repl.fsx" />
+    <None Include="Scripts\Repl0.fsx" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
