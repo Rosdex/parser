@@ -173,12 +173,12 @@ module CatalogTests =
                 DivisorCatalog.ofCase case
                 |> Catalog.descendants <| case.Target
                 |> List.map ValueStub.id
-                |> shouldContainsAll (DivisorCatalog.descendantsInCase case) ""
+                |> shouldSequenceEqual (DivisorCatalog.descendantsInCase case) ""
             testPropertyWithConfig Arb.config "descendantsAndSelf" <| fun case ->
                 DivisorCatalog.ofCase case
                 |> Catalog.descendantsAndSelf <| case.Target
                 |> List.map ValueStub.id
-                |> shouldContainsAll (DivisorCatalog.descendantsAndSelfInCase case) ""
+                |> shouldSequenceEqual (DivisorCatalog.descendantsAndSelfInCase case) ""
             testPropertyWithConfig Arb.config "removeCascade" <| fun case ->
                 DivisorCatalog.ofCase case
                 |> Catalog.removeCascade case.Target
