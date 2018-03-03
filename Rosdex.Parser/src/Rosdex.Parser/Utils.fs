@@ -1,5 +1,10 @@
 ﻿namespace Rosdex.Parser.Utils
 
+[<AutoOpen>]
+module AutoOpened =
+    let inline (!>) (x:^a) : ^b =
+        ((^a or ^b) : (static member op_Implicit : ^a -> ^b) x)
+
 module List =
     let unreduce generator value =
         let rec impl value acc =

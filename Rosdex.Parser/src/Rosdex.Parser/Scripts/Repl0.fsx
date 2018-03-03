@@ -26,7 +26,7 @@ let pipe (source : string) (target : string) =
     | _ ->
         let writer = CsvWriters.ExtendedOffers.ofCatalog categories
         offers
-        |> Seq.choose (CsvWriter.tryStringifyValue writer)
+        |> Seq.choose (CsvWriter.tryStringifyItem writer >> Result.tryOk)
         |> Seq.append
             [writer.Fields |> List.map (fun p -> p.Name) |> String.concat ", "]
         |> File.writeLines target

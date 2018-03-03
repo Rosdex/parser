@@ -1,5 +1,7 @@
 ﻿namespace Rosdex.Parser.Csv
 
+open Rosdex.Parser.Utils
+
 [<RequireQualifiedAccess>]
 type CsvCell =
     | String of string
@@ -11,28 +13,6 @@ type 'a CsvField = {
     Mapping : 'a -> CsvCell option
 }
 
-type CsvField =
-    static member private createOpt toFieldType mapping name =
-        {   Name = name
-            Mapping = mapping >> Option.map toFieldType }
-    static member private createTrue toFieldType mapping name =
-        {   Name = name
-            Mapping = mapping >> toFieldType >> Some }
-
-    static member create mapping =
-        CsvField.createOpt CsvCell.String mapping
-    static member create mapping =
-        CsvField.createOpt CsvCell.Int mapping
-    static member create mapping =
-        CsvField.createOpt CsvCell.Float mapping
-
-    static member create mapping =
-        CsvField.createTrue CsvCell.String mapping
-    static member create mapping =
-        CsvField.createTrue CsvCell.Int mapping
-    static member create mapping =
-        CsvField.createTrue CsvCell.Float mapping
-
 module CsvField =
     let map mapping field =
         { field with Mapping = field.Mapping >> Option.map mapping }
@@ -40,8 +20,44 @@ module CsvField =
     let bind binder field =
         { field with Mapping = field.Mapping >> Option.bind binder }
 
-    let mapWithNone mapping field =
+    let mapOption mapping field =
         { field with Mapping = field.Mapping >> mapping }
+
+    let create name mapping = {
+        Name = name
+        Mapping = mapping
+    }
+
+module Operators =
+    /// Промежуточный тип необходимый только для DSL.
+    module MappingCaster =
+        type 'a MappingCaster =
+            | Mapping of ('a -> CsvCell option)
+        let value (Mapping value) = value
+
+        let ofValue toCell f =
+            f >> toCell >> Some |> Mapping
+        let ofOption toCell f =
+            f >> Option.map toCell |> Mapping
+
+        type 'a MappingCaster with
+            static member op_Implicit f = ofValue CsvCell.String f
+            static member op_Implicit f = ofValue CsvCell.Int f
+            static member op_Implicit f = ofValue CsvCell.Float f
+            static member op_Implicit f = ofOption CsvCell.String f
+            static member op_Implicit f = ofOption CsvCell.Int f
+            static member op_Implicit f = ofOption CsvCell.Float f
+            static member op_Implicit f = Mapping f
+            static member op_Implicit f = f >> Some |> Mapping
+
+    let inline private (==>)
+            (mapping : 'a -> ^b)
+            (factory : ^c -> 'a CsvField) =
+        ((^b or ^c) : (static member op_Implicit : ('a -> ^b) -> ^c) mapping)
+        |> factory
+
+    let inline (=>) mapping name =
+        mapping ==> (MappingCaster.value >> CsvField.create name)
 
 type CsvConfig = {
     Separator : string
@@ -59,11 +75,10 @@ module CsvConfig =
             | CsvCell.String p -> p
     }
 
-    let tryEscape config (str : string) =
-        // TODO: Экранирование переводов строк.
+    let tryCanonicalize config (str : string) =
         match
-            str.Contains config.Separator
-            || (config.AllowQuote |> Option.exists str.Contains)
+            config.AllowQuote |> Option.exists str.Contains
+            || str.Contains config.Separator
             || str.Contains "\n"
             , config.AllowQuote
             with
@@ -82,29 +97,38 @@ type 'a CsvWriter = {
     Config : CsvConfig
 }
 
+open Microsoft.FSharpLu
+
 module CsvWriter =
     let tryStringifyField config field item =
-        match item |> field.Mapping with
-        | Some p -> config.Write p
-        | None -> ""
-        |> CsvConfig.tryEscape config
+        item
+        |> field.Mapping
+        |> Option.mapOrDefault config.Write ""
+        |> CsvConfig.tryCanonicalize config
 
-    let tryStringifyValue writer item =
-        writer.Fields
-        |> List.map (fun field ->
+    let private tryBuildRow writer mapping =
+        let rec f fields acc =
+            match fields with
+            | [] -> acc |> List.rev |> Ok
+            | field::fields ->
+                match field |> mapping with
+                | None -> Error field
+                | Some p -> p::acc |> f fields
+        f writer.Fields []
+        |> Result.map (String.concat writer.Config.Separator)
+
+    let tryStringifyItem writer item =
+        tryBuildRow writer (fun field ->
             tryStringifyField writer.Config field item)
-        |> List.partition Option.isSome
-        |> function
-            | p, [] ->
-                p
-                |> List.map Option.get
-                |> String.concat writer.Config.Separator
-                |> Some
-            | _ -> None
+
+    let tryStringfyHeaders writer =
+        tryBuildRow writer (fun field ->
+            field.Name |> CsvConfig.tryCanonicalize writer.Config)
 
 module CsvWriters =
     open Rosdex.Parser.Yandex.Yml
     open Rosdex.Parser.Collections
+    open Operators
 
     module ExtendedOffers =
         let fullName offer =
@@ -119,8 +143,10 @@ module CsvWriters =
             offer.Params
             |> Seq.map (fun p ->
                 match p.Value with
-                    | UnitValue (unitName, value) -> sprintf "%s | %s | %f" p.Name unitName value
-                    | StringValue value -> sprintf "%s | %s" p.Name value)
+                | UnitValue (unitName, value) ->
+                    sprintf "%s | %s | %f" p.Name unitName value
+                | StringValue value ->
+                    sprintf "%s | %s" p.Name value)
             |> String.concat "; "
 
         let categoryPath catalog offer =
@@ -130,34 +156,40 @@ module CsvWriters =
             |> List.map Category.name
             |> String.concat " | "
 
+        let canonicalize cell =
+            let stub = " "
+            let replaceComas = String.replace "," "."
+            let removeEndLines =
+                String.filter (fun p ->
+                    p <> '\r' && p <> '\n')
+            let replaceEmptyString = function
+                | "" -> stub
+                | p -> p
+            match cell with
+            | Some (CsvCell.String p) ->
+                p
+                |> replaceComas
+                |> removeEndLines
+                |> String.trim
+                |> replaceEmptyString
+                |> CsvCell.String
+                |> Some
+            | None -> CsvCell.String stub |> Some
+            | p -> p
+
         let ofCatalog catalog = {
             Config = { CsvConfig.default' with AllowQuote = None }
             Fields =
-                [   "LocalId" |> CsvField.create (fun p -> p.LocalId)
-                    "FullName" |> CsvField.create fullName
-                    "TypePrefix" |> CsvField.create (fun p -> p.TypePrefix)
-                    "Vendor" |> CsvField.create (fun p -> p.Vendor)
-                    "Name" |> CsvField.create (fun p -> p.Name)
-                    "Model" |> CsvField.create (fun p -> p.Model)
-                    "Params" |> CsvField.create params'
-                    "Description" |> CsvField.create (fun p -> p.Description)
-                    "PictureUrl" |> CsvField.create (fun p -> p.PictureUrl)
-                    "LocalCategoryId" |> CsvField.create (fun p -> p.LocalCategoryId)
-                    "LocalCategoryPath" |> CsvField.create (categoryPath catalog) ]
-                |> List.map (
-                    CsvField.mapWithNone (
-                        let empty = " "
-                        function
-                        | Some (CsvCell.String p) ->
-                            p.Replace(',', '.')
-                            |> String.filter (fun p ->
-                                p <> '\r' && p <> '\n')
-                            |> String.trim
-                            |> function
-                                | "" -> empty
-                                | p -> p
-                            |> CsvCell.String
-                            |> Some
-                        | None -> CsvCell.String empty |> Some
-                        | p -> p))
+                [   (fun p -> p.LocalId) => "LocalId"
+                    fullName => "FullName"
+                    (fun p -> p.TypePrefix) => "TypePrefix"
+                    (fun p -> p.Vendor) => "Vendor"
+                    (fun p -> p.Name) => "Name"
+                    (fun p -> p.Model) => "Model"
+                    params' => "Params"
+                    (fun p -> p.Description) => "Description"
+                    (fun p -> p.PictureUrl) => "PictureUrl"
+                    (fun p -> p.LocalCategoryId) => "LocalCategoryId"
+                    categoryPath catalog => "LocalCategoryPath" ]
+                |> List.map (CsvField.mapOption canonicalize)
         }
