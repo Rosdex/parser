@@ -4,6 +4,7 @@ framework: net461, netstandard2.0
 
 nuget FSharp.Data
 nuget Microsoft.FSharpLu.Json
+nuget Microsoft.FSharpLu
 
 nuget SQLProvider
 nuget Npgsql 3.1.0

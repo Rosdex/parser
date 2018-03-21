@@ -1,18 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{61FDA823-3881-437C-8B65-23526EDA3A72}"
 	ProjectSection(SolutionItems) = preProject
 		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2AF295B3-FC48-4210-8581-B74D8D25DD5E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A7651EC9-3F13-4689-A573-1CD20534AEA2}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rosdex.Parser", "src\Rosdex.Parser\Rosdex.Parser.fsproj", "{5F3AADCE-05D8-43A0-A9A3-D02202821A1C}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Rosdex.Parser", "src\Rosdex.Parser\Rosdex.Parser.fsproj", "{5F3AADCE-05D8-43A0-A9A3-D02202821A1C}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rosdex.Parser.Tests", "tests\Rosdex.Parser.Tests\Rosdex.Parser.Tests.fsproj", "{077F17E5-1810-4F11-BA29-9C8ADC81BBF2}"
 EndProject

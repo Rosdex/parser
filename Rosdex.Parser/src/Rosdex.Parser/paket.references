@@ -1,5 +1,6 @@
 ﻿FSharp.Data
 Microsoft.FSharpLu.Json
+Microsoft.FSharpLu
 
 SQLProvider
 Npgsql
