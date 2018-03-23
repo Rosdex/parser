@@ -15,6 +15,11 @@ module Catalog =
     let getId catalog = catalog.GetId
     let getParentId catalog = catalog.GetParentId
 
+    let toSeq catalog =
+        catalog.Storage
+        |> Map.toSeq
+        |> Seq.map snd
+
     let create getId getParentId values = {
         Storage = values |> Seq.map (fun p -> getId p, p) |> Map.ofSeq
         GetId = getId
@@ -47,7 +52,7 @@ module Catalog =
         |> Map.ofList
 
     [<RequireQualifiedAccess>]
-    type 'value Validation =
+    type Validation =
         | Valid
         | Disconected
         /// Подмножество Disconnected, но приводит к более серьезным проблемам.
