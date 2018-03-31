@@ -1582,17 +1582,17 @@
           <Paket>True</Paket>
         </Reference>
         <Reference Include="Microsoft.TestPlatform.CoreUtilities">
-          <HintPath>..\..\packages\tests\Microsoft.TestPlatform.ObjectModel.15.6.0\lib\net451\Microsoft.TestPlatform.CoreUtilities.dll</HintPath>
+          <HintPath>..\..\packages\tests\Microsoft.TestPlatform.ObjectModel.15.6.1\lib\net451\Microsoft.TestPlatform.CoreUtilities.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
         <Reference Include="Microsoft.TestPlatform.PlatformAbstractions">
-          <HintPath>..\..\packages\tests\Microsoft.TestPlatform.ObjectModel.15.6.0\lib\net451\Microsoft.TestPlatform.PlatformAbstractions.dll</HintPath>
+          <HintPath>..\..\packages\tests\Microsoft.TestPlatform.ObjectModel.15.6.1\lib\net451\Microsoft.TestPlatform.PlatformAbstractions.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
         <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
-          <HintPath>..\..\packages\tests\Microsoft.TestPlatform.ObjectModel.15.6.0\lib\net451\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
+          <HintPath>..\..\packages\tests\Microsoft.TestPlatform.ObjectModel.15.6.1\lib\net451\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>

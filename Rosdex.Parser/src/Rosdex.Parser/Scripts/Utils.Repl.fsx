@@ -4,6 +4,7 @@
 #load """../Utils.fs"""
 #load """../Collections.fs"""
 #load """../Yandex.Yml.fs"""
+#load """../Dump.fs"""
 #load """../Csv.fs"""
 
 module Clipboard =
@@ -74,6 +75,7 @@ module IO =
 
 type Gitignored = {
     YmlSourceFilesPath : string option
+    DumpDbFilePath : string option
 }
 
 let gitignored =

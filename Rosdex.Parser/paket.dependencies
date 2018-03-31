@@ -7,6 +7,7 @@ nuget Microsoft.FSharpLu.Json
 nuget Microsoft.FSharpLu
 
 nuget SQLProvider
+nuget System.Data.SQLite
 nuget Npgsql 3.1.0
 nuget System.Threading.Tasks.Extensions
 
