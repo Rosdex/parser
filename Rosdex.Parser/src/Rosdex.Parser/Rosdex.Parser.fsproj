@@ -15,6 +15,7 @@
     <Compile Include="Yandex.Yml.fs" />
     <Compile Include="Dump.fs" />
     <Compile Include="Csv.fs" />
+    <Compile Include="Csv.Writers.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>
   <ItemGroup>
