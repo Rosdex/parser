@@ -1,6 +1,7 @@
 ﻿#load """Utils.Repl.fsx"""
 
 open Rosdex.Parser.Csv
+open Rosdex.Parser.Csv.Writers
 open Rosdex.Parser.Yandex.Yml
 open Rosdex.Parser.Utils
 open Rosdex.Parser.Collections

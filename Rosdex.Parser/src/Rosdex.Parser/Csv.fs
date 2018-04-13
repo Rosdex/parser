@@ -59,6 +59,7 @@ module Operators =
 
 type CsvConfig = {
     Separator : string
+    // TODO: QuoteStrategy DU
     AllowQuote : string option
     Write : CsvCell -> string
 }
@@ -96,6 +97,11 @@ type 'a CsvWriter = {
 }
 
 module CsvWriter =
+    let ofFields fields = {
+        Fields = fields
+        Config = CsvConfig.default'
+    }
+
     let tryStringifyField config field item =
         item
         |> field.Mapping
@@ -118,6 +124,18 @@ module CsvWriter =
         tryBuildRow writer (fun field ->
             tryStringifyField writer.Config field item)
 
-    let tryStringfyHeaders writer =
+    let tryStringifyHeaders writer =
         tryBuildRow writer (fun field ->
             field.Name |> CsvConfig.tryCanonicalize writer.Config)
+
+    let stringifyHeaders writer =
+        match tryStringifyHeaders writer with
+        | Ok p -> p
+        | Error field ->
+            failwithf "Field %A cannot stringify header." field
+
+    let stringifyItem writer item =
+        match tryStringifyItem writer item with
+        | Ok p -> p
+        | Error field ->
+            failwithf "Field %A cannot stringify %A." field item

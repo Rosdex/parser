@@ -6,6 +6,7 @@
 #load """../Yandex.Yml.fs"""
 #load """../Dump.fs"""
 #load """../Csv.fs"""
+#load """../Csv.Writers.fs"""
 
 module Clipboard =
     type private Clipboard = System.Windows.Forms.Clipboard
@@ -73,11 +74,15 @@ module IO =
                 let count = reader.Read(buffer, 0, buffer.Length)
                 writer.Write(buffer, 0, count)
 
+// TODO: Заменить на YML.
 type Gitignored = {
     YmlSourceFilesPath : string option
     DumpDbFilePath : string option
+    OutputDirectoryPath : string option
 }
 
-let gitignored =
-    System.IO.File.ReadAllText (__SOURCE_DIRECTORY__ + "/gitignored.json")
-    |> Microsoft.FSharpLu.Json.Compact.deserialize<Gitignored>
+let gitignored : Gitignored =
+    "gitignored.json"
+    |> IO.Path.combine __SOURCE_DIRECTORY__
+    |> System.IO.File.ReadAllText
+    |> Microsoft.FSharpLu.Json.Compact.deserialize

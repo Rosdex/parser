@@ -87,6 +87,21 @@ products'
         else
             Some (p, category))
 
+open Rosdex.Parser.Csv
+open Microsoft.FSharpLu
+open Utils
+
+[
+    yield CsvWriter.stringifyHeaders Writers.dumpWriter
+    yield!
+        regrouppedProducts
+        |> Seq.map (CsvWriter.stringifyItem Writers.dumpWriter)
+]
+|> File.writeLines
+    (Repl.gitignored.OutputDirectoryPath
+        |> Option.get
+        |> Repl.IO.Path.combine <| "dump.csv")
+
 ///
 
 let mains =
