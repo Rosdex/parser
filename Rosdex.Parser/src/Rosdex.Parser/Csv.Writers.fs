@@ -85,5 +85,6 @@ let dumpWriter catalog : Rosdex.Parser.Dump.Product CsvWriter =
         typePrefixedName catalog => "ProductNameWithTypePrefix"
         (fun p -> p.Data.Image) => "ImageLink"
         (fun p -> p.Data.Description) => "Description"
+        (fun p -> p.Data.OriginalUrl) => "OriginalUrl"
         (fun p -> p.CategoryId) => "CategoryId"
     ]
