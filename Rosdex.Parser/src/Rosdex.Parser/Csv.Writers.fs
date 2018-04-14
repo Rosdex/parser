@@ -68,10 +68,22 @@ module ExtendedOffers =
             |> List.map (CsvField.mapOption canonicalize)
     }
 
-let dumpWriter : Rosdex.Parser.Dump.Product CsvWriter =
+open Rosdex.Parser.Collections
+
+let private typePrefixedName catalog (item : Rosdex.Parser.Dump.Product)=
+    Catalog.find catalog item.CategoryId
+    |> fun (category : Rosdex.Parser.Dump.Category) ->
+        sprintf "%s %s %s"
+            item.Data.Vendor
+            item.Data.Name
+            category.Name
+
+let dumpWriter catalog : Rosdex.Parser.Dump.Product CsvWriter =
     CsvWriter.ofFields [
         (fun p -> p.Id) => "ProductId"
-        (fun p -> p.Data.Name) => "ProductName"
+        (fun p -> p.Data.Vendor + " " + p.Data.Name ) => "ProductName"
+        typePrefixedName catalog => "ProductNameWithTypePrefix"
         (fun p -> p.Data.Image) => "ImageLink"
+        (fun p -> p.Data.Description) => "Description"
         (fun p -> p.CategoryId) => "CategoryId"
     ]

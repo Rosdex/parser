@@ -92,10 +92,12 @@ open Microsoft.FSharpLu
 open Utils
 
 [
-    yield CsvWriter.stringifyHeaders Writers.dumpWriter
+    yield
+        Writers.dumpWriter categories'
+        |> CsvWriter.stringifyHeaders
     yield!
         regrouppedProducts
-        |> Seq.map (CsvWriter.stringifyItem Writers.dumpWriter)
+        |> Seq.map (Writers.dumpWriter categories' |> CsvWriter.stringifyItem)
 ]
 |> File.writeLines
     (Repl.gitignored.OutputDirectoryPath
